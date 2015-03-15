@@ -1,0 +1,46 @@
+#version 130	
+
+uniform float time;
+uniform float width, height;
+uniform sampler2D scene, depth;
+
+float threshold = 0.01;
+
+vec4 edgeColor = vec4(1.0, 1.0, 1.0, 1.0);
+
+in vec2 uv;
+
+int IsEdge(float depthStep, float radius)
+{
+	for(float i = -radius; i <= radius; ++i)
+	{
+		for(float j = -radius; j <= radius; ++j)
+		{
+			float stepx = i/width, stepy = j/height;
+			float dist = max(abs(stepx), abs(stepy));	
+			float neighbourDepth = texture(depth, vec2(uv.x + stepx, uv.y + stepy)).x;
+			if(neighbourDepth - depthStep > threshold*dist*40)
+			{ 		
+				return 1;
+			}
+		}
+	}
+	return 0;
+}
+
+void main()  
+{  
+    float depthStep = texture(depth, uv).x;
+    float radius = clamp(1.0, 0.05, 5.0);
+
+    if(IsEdge(depthStep, radius) == 1) gl_FragColor = edgeColor;
+    else if(depthStep < 1.0)
+    {
+	gl_FragColor = texture(scene, uv);
+    }
+    else
+    {
+ 	gl_FragColor = vec4(1.0, 0.2, 0.2, 1.0) * (1.0 - uv.y);
+    }
+}
+

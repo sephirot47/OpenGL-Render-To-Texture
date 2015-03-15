@@ -1,2 +1,3 @@
-# OpenGL-Render-To-Texture
-Rendering to texture using FrameBuffer
+# RealEngine
+3D OpenGL engine
+ 
